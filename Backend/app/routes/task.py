@@ -23,9 +23,17 @@ def create_task(task:TaskCreate,db:Session=Depends(get_db),user=Depends(get_curr
 
 @router.get("/",response_model=list[TaskResponse])
 def get_task(db:Session=Depends(get_db),user=Depends(get_current_user)):
+   
+
+    
     tasklist=db.query(Task).filter(Task.owner_id==user["id"]).all()
     if not tasklist:
         raise HTTPException(status_code=404,detail="task not found")
+    if user['role']=="admin":
+        tasklist=db.query(Task).all()
+
+
+    
     return tasklist
 
 @router.get("/{task_id}",response_model=TaskResponse)
